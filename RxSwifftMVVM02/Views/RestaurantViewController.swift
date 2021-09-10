@@ -27,8 +27,11 @@ class RestaurantViewController: UIViewController {
         
         // tương đương UITableVIewDataSource
         /*
-         
-         
+         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            cell.textLabel?.text = viewModel.displayText
+            return cell
+         }
          */
         viewModel
             .fetchRestaurantViewModels()
@@ -39,6 +42,14 @@ class RestaurantViewController: UIViewController {
 
         
         // tương đương UITableViewDelegate
+        /*
+         func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
+            vc.title = restaurentObject.displayText
+            self.navigationController?.pushViewController(vc, animated: true)
+         }
+         */
         tableView
             .rx.modelSelected(RestaurantViewModel.self)
             .subscribe(onNext: { restaurentObject in

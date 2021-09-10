@@ -13,8 +13,4 @@ class RestaurantDetailViewController: UIViewController {
         super.viewDidLoad()
 
     }
-    
-
-    
-
 }

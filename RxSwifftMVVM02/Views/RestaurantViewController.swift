@@ -13,11 +13,11 @@ class RestaurantViewController: UIViewController {
 
     let disposeBag = DisposeBag()
     
-    private var viewModel: RestaurantsListViewModel = RestaurantsListViewModel()
+    private var restaurantsListViewModel: RestaurantsListViewModel = RestaurantsListViewModel()
     
-    @IBOutlet weak var tableView: UITableView! {
+    @IBOutlet weak var restaurantTableView: UITableView! {
         didSet {
-            tableView.tableFooterView = UIView()
+            restaurantTableView.tableFooterView = UIView()
         }
     }
     
@@ -25,38 +25,41 @@ class RestaurantViewController: UIViewController {
         super.viewDidLoad()
         title = "Restaurants"
         
-        // tương đương UITableVIewDataSource
+        /// tương đương UITableVIewDataSource
         /*
-         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = viewModel.displayText
-            return cell
-         }
-         */
-        viewModel
-            .fetchRestaurantViewModels()
-            .bind(to: tableView.rx.items(cellIdentifier: "cell"))
-            { index, viewModel, cell in
+             func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
                 cell.textLabel?.text = viewModel.displayText
-            }.disposed(by: disposeBag)
-
-        
-        // tương đương UITableViewDelegate
-        /*
-         func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
-            vc.title = restaurentObject.displayText
-            self.navigationController?.pushViewController(vc, animated: true)
-         }
+                return cell
+             }
          */
-        tableView
-            .rx.modelSelected(RestaurantViewModel.self)
-            .subscribe(onNext: { restaurentObject in
+        restaurantsListViewModel
+            .fetchRestaurantViewModels()
+            .bind(to:
+                    restaurantTableView
+                    .rx
+                    .items(cellIdentifier: "cell")) { index, viewModel, cell in
+                cell.textLabel?.text = viewModel.displayText
+            }
+            .disposed(by: disposeBag)
+        
+        /// tương đương UITableViewDelegate
+        /*
+             func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                let vc = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
-                vc.title = restaurentObject.displayText
-                self.navigationController?.pushViewController(vc, animated: true)
+                let viewController = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
+         viewController.title = restaurentObject.displayText
+                self.navigationController?.pushViewController(viewController, animated: true)
+             }
+         */
+        restaurantTableView
+            .rx
+            .modelSelected(RestaurantViewModel.self)
+            .subscribe(onNext: { [weak self] restaurentObject in
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let viewController = storyboard.instantiateViewController(withIdentifier: "RestaurantDetailViewController") as! RestaurantDetailViewController
+                viewController.title = restaurentObject.displayText
+                self?.navigationController?.pushViewController(viewController, animated: true)
             })
             .disposed(by: disposeBag)
     }
